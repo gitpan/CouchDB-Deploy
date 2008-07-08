@@ -4,7 +4,7 @@ package CouchDB::Deploy;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use CouchDB::Client;
 use CouchDB::Deploy::Process;
@@ -16,13 +16,12 @@ use Sub::Exporter -setup => {
         doc         => \&_build_doc,
         design      => \&_build_design,
         file        => \&_build_file,
+        base64      => \&_build_base64,
     ],
     groups  => {
-        default => [qw(db containing doc design file)],
+        default => [qw(db containing doc design file base64)],
     },
 };
-
-use Data::Dumper;
 
 my $p;
 BEGIN {
@@ -74,6 +73,13 @@ sub _build_file {
     };
 }
 
+sub _build_base64 {
+    return sub ($) {
+        my $content = shift;
+        return CouchDB::Client::Doc->toBase64($content);
+    };
+}
+
 
 1;
 
@@ -99,6 +105,12 @@ CouchDB::Deploy - Simple configuration scripting to deploy CouchDB databases
                 'bar.svg'   => {
                     content_type    => 'image/svg+xml',
                     data            => file 'dahut.svg',
+                },
+                'circle.html'   => {
+                    content_type    => 'text/html;charset=utf-8',
+                    data            => base64 <<EOHTML,
+                                            <p>Hello!</p>
+    EOHTML
                 },
             },
         };
@@ -147,7 +159,7 @@ create or update it if not
 
 =item *
 
-Provide a simple helper for attachments
+Provide a simple helper for attachments and the specific base64 that CouchDB requires.
 
 =back
 
@@ -174,6 +186,10 @@ logic). The content is of the exact same structure as the JSON one would post to
 Reads the file at $PATH, converts it to base64, and returns that on a single line. This is a
 helper made to assist in creating CouchDB attachments. Note that in the current state it will
 read the file into memory.
+
+=item base64 $CONTENT
+
+Returns the content encoded in single-line Base 64.
 
 =item design { CONTENT }
 

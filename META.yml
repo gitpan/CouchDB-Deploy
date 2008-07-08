@@ -14,11 +14,9 @@ no_index:
     - inc
     - t
 requires:
-  CouchDb::Client: 0
+  CouchDB::Client: 0
   Data::Compare: 0
-  Exception::Class: 0
   File::Spec: 0
-  MIME::Base64: 0
   Sub::Exporter: 0
-  perl: 5.6
-version: 0.01
+  perl: 5.6.0
+version: 0.02
