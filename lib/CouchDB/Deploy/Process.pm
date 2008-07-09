@@ -9,8 +9,6 @@ our $VERSION = $CouchDB::Deploy::VERSION;
 use Carp            qw(confess);
 use CouchDB::Client;
 use File::Spec;
-use Exception::Class;
-#use MIME::Base64    qw(encode_base64);
 use Data::Compare   qw(Compare);
 *_SAME = \&Compare;
 
@@ -29,12 +27,7 @@ sub createDBUnlessExists {
     
     $dbName .= '/' unless $dbName =~ m{/$};
     if (not $self->{client}->dbExists($dbName)) {
-        eval {
-            $self->{db} = $self->{client}->newDB($dbName)->create();
-        };
-        if (my $e = Exception::Class->caught()) {
-            die $e;
-        }
+        $self->{db} = $self->{client}->newDB($dbName)->create();
         return 1;
     }
     else {
